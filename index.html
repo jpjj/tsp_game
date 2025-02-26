@@ -1,207 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Traveling Salesperson Game</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #f5f5f5;
-      line-height: 1.6;
-    }
-    
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-      margin-bottom: 20px;
-    }
-    
-    .game-container {
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      padding: 20px;
-      margin-bottom: 30px;
-    }
-    
-    canvas {
-      display: block;
-      margin: 0 auto;
-      background-color: #f8f9fa;
-      border: 1px solid #dee2e6;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-    
-    .controls {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    
-    .control-group {
-      margin-bottom: 15px;
-    }
-    
-    button {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-right: 8px;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    
-    button:hover {
-      background-color: #2980b9;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-    
-    button:active {
-      transform: translateY(0);
-    }
-    
-    button:disabled {
-      background-color: #95a5a6;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .stats {
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #f1f5f9;
-      border-radius: 6px;
-      border-left: 4px solid #3498db;
-    }
-    
-    .game-instructions {
-      margin-top: 30px;
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    
-    .game-instructions h2 {
-      color: #2c3e50;
-      border-bottom: 2px solid #f1f5f9;
-      padding-bottom: 10px;
-      margin-bottom: 15px;
-    }
-    
-    .best-path {
-      color: #27ae60;
-      font-weight: bold;
-    }
-    
-    .current-path {
-      color: #3498db;
-      font-weight: bold;
-    }
-    
-    #difficulty-select {
-      padding: 10px;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-      background-color: white;
-      font-size: 14px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-    
-    .slider-container {
-      display: flex;
-      align-items: center;
-      margin: 15px 0;
-    }
-    
-    .slider-container label {
-      margin-right: 15px;
-      min-width: 80px;
-      font-weight: bold;
-      color: #2c3e50;
-    }
-    
-    input[type="range"] {
-      flex-grow: 1;
-      height: 8px;
-      accent-color: #3498db;
-    }
-    
-    .value-display {
-      margin-left: 15px;
-      min-width: 30px;
-      text-align: center;
-      background: #3498db;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 10px;
-      font-size: 12px;
-    }
-    
-    .tooltip {
-      position: relative;
-      display: inline-block;
-      margin-left: 5px;
-      cursor: help;
-    }
-    
-    .tooltip .tooltip-text {
-      visibility: hidden;
-      width: 200px;
-      background-color: #555;
-      color: #fff;
-      text-align: center;
-      border-radius: 6px;
-      padding: 5px;
-      position: absolute;
-      z-index: 1;
-      bottom: 125%;
-      left: 50%;
-      margin-left: -100px;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    
-    .tooltip:hover .tooltip-text {
-      visibility: visible;
-      opacity: 1;
-    }
-    
-    footer {
-      text-align: center;
-      margin-top: 30px;
-      color: #7f8c8d;
-      font-size: 14px;
-    }
-    
-    @media (max-width: 600px) {
-      .controls {
-        flex-direction: column;
-      }
-      
-      canvas {
-        width: 100%;
-        height: auto;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body>
   <h1>Traveling Salesperson Game</h1>
-  
+  <h2>Connect all cities, find the best roundtrip!</h2>
   <div class="game-container">
     <div class="control-group">
       <label for="difficulty-select">Difficulty: </label>
@@ -218,31 +27,32 @@
       </div>
       <button id="new-game-btn">New Game</button>
     </div>
-    
+
     <div class="slider-container">
       <label for="city-size">City Size:</label>
       <input type="range" id="city-size" min="4" max="15" value="8">
       <span id="city-size-value" class="value-display">8</span>
     </div>
-    
+
     <canvas id="tsp-canvas" width="700" height="400"></canvas>
-    
+
     <div class="controls">
       <div class="control-group">
         <button id="reset-path-btn">Reset Path</button>
         <button id="undo-btn" disabled>Undo Last</button>
         <button id="clear-best-btn">Clear Best Path</button>
       </div>
-      
+
       <div class="control-group">
         <button id="nearest-neighbor-btn" title="Quick approximation algorithm">Nearest Neighbor Solution</button>
         <button id="optimal-btn" title="2-opt improvement algorithm">Show 2-Opt Solution</button>
         <span class="tooltip">?
-          <span class="tooltip-text">2-opt is a local optimization technique that improves a tour by swapping edges</span>
+          <span class="tooltip-text">2-opt is a local optimization technique that improves a tour by swapping
+            edges</span>
         </span>
       </div>
     </div>
-    
+
     <div class="stats">
       <p>Cities visited: <span id="cities-visited">0</span> / <span id="total-cities">15</span></p>
       <p>Current path length: <span id="current-length" class="current-path">0</span></p>
@@ -251,542 +61,30 @@
       <p>2-Opt solution: <span id="optimal-length">N/A</span></p>
     </div>
   </div>
-  
+
   <div class="game-instructions">
     <h2>How to Play</h2>
     <ol>
       <li>Click on cities to create a path that visits each city exactly once and returns to the starting city.</li>
       <li>Try to find the shortest possible path (the optimal solution to the TSP).</li>
       <li>Use the "Nearest Neighbor Solution" button to see a quick approximation.</li>
-      <li>Use the "Show 2-Opt Solution" button to see a higher-quality solution (not guaranteed to be optimal for larger problems).</li>
+      <li>Use the "Show 2-Opt Solution" button to see a higher-quality solution (not guaranteed to be optimal for larger
+        problems).</li>
       <li>Adjust difficulty to change the number of cities or set a custom number.</li>
     </ol>
-    <p>The Traveling Salesperson Problem is famously difficult - finding the absolute optimal solution for large numbers of cities is computationally intensive!</p>
-    <p>This problem is <strong>NP-hard</strong>, which means the time required to solve it grows exponentially with the number of cities. For just 20 cities, there are over 60 quintillion possible routes!</p>
+    <p>The Traveling Salesperson Problem is famously difficult - finding the absolute optimal solution for large numbers
+      of cities is computationally intensive!</p>
+    <p>This problem is <strong>NP-hard</strong>, which means the time required to solve it grows exponentially with the
+      number of cities. For just 20 cities, there are over 60 quintillion possible routes!</p>
   </div>
 
   <footer>
-    <p>© 2025 TSP Game | <a href="https://github.com/yourusername/tsp_game" target="_blank">View on GitHub</a></p>
+    <p>© 2025 TSP Game | <a href="https://github.com/jpjj/tsp_game" target="_blank">View on GitHub</a> | <a
+        href="https://jpjj.github.io" target="_blank">View my Website</a></p>
   </footer>
 
-  <script>
-    // Game state
-    const state = {
-      cities: [],
-      path: [],
-      optimalPath: [],
-      nearestNeighborPath: [],
-      bestPathLength: Infinity,
-      bestPath: [],
-      citySize: 8,
-      gameStarted: false,
-      difficulty: {
-        easy: 10,
-        medium: 15,
-        hard: 25,
-        expert: 40,
-        custom: 20
-      }
-    };
-
-    // DOM Elements
-    const canvas = document.getElementById('tsp-canvas');
-    const ctx = canvas.getContext('2d');
-    const citiesVisitedElement = document.getElementById('cities-visited');
-    const totalCitiesElement = document.getElementById('total-cities');
-    const currentLengthElement = document.getElementById('current-length');
-    const bestLengthElement = document.getElementById('best-length');
-    const nnLengthElement = document.getElementById('nn-length');
-    const optimalLengthElement = document.getElementById('optimal-length');
-    const undoButton = document.getElementById('undo-btn');
-    const resetPathButton = document.getElementById('reset-path-btn');
-    const clearBestButton = document.getElementById('clear-best-btn');
-    const nearestNeighborButton = document.getElementById('nearest-neighbor-btn');
-    const optimalButton = document.getElementById('optimal-btn');
-    const newGameButton = document.getElementById('new-game-btn');
-    const difficultySelect = document.getElementById('difficulty-select');
-    const customCitiesContainer = document.getElementById('custom-cities-container');
-    const customCitiesInput = document.getElementById('custom-cities');
-    const citySizeInput = document.getElementById('city-size');
-    const citySizeValue = document.getElementById('city-size-value');
-
-    // Make canvas responsive
-    function resizeCanvas() {
-      const container = document.querySelector('.game-container');
-      const containerWidth = container.clientWidth - 40; // Minus padding
-      
-      if (window.innerWidth <= 800) {
-        canvas.width = containerWidth;
-        canvas.height = containerWidth * 0.6;
-        
-        if (state.gameStarted) {
-          drawGame();
-        }
-      }
-    }
-
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    // Event listeners
-    canvas.addEventListener('click', handleCanvasClick);
-    undoButton.addEventListener('click', undoLastCity);
-    resetPathButton.addEventListener('click', resetPath);
-    clearBestButton.addEventListener('click', clearBestPath);
-    nearestNeighborButton.addEventListener('click', showNearestNeighborSolution);
-    optimalButton.addEventListener('click', showOptimalSolution);
-    newGameButton.addEventListener('click', startNewGame);
-    
-    difficultySelect.addEventListener('change', () => {
-      const selectedDifficulty = difficultySelect.value;
-      if (selectedDifficulty === 'custom') {
-        customCitiesContainer.style.display = 'block';
-        state.difficulty.custom = parseInt(customCitiesInput.value);
-        totalCitiesElement.textContent = state.difficulty.custom;
-      } else {
-        customCitiesContainer.style.display = 'none';
-        totalCitiesElement.textContent = state.difficulty[selectedDifficulty];
-      }
-    });
-    
-    customCitiesInput.addEventListener('change', () => {
-      let value = parseInt(customCitiesInput.value);
-      // Ensure value is between 5 and 100
-      value = Math.max(5, Math.min(100, value));
-      customCitiesInput.value = value;
-      state.difficulty.custom = value;
-      totalCitiesElement.textContent = value;
-    });
-    
-    citySizeInput.addEventListener('input', (e) => {
-      state.citySize = parseInt(e.target.value);
-      citySizeValue.textContent = state.citySize;
-      if (state.gameStarted) {
-        drawGame();
-      }
-    });
-
-    // Initialize the game
-    function initGame() {
-      state.gameStarted = false;
-      state.cities = [];
-      state.path = [];
-      state.optimalPath = [];
-      state.nearestNeighborPath = [];
-      
-      // Keep best path between games if not cleared
-      
-      const difficultyValue = difficultySelect.value;
-      let numCities;
-      
-      if (difficultyValue === 'custom') {
-        numCities = parseInt(customCitiesInput.value);
-        state.difficulty.custom = numCities;
-      } else {
-        numCities = state.difficulty[difficultyValue];
-      }
-      
-      // Generate random cities
-      for (let i = 0; i < numCities; i++) {
-        const margin = Math.max(30, state.citySize * 2);
-        const x = Math.random() * (canvas.width - 2 * margin) + margin;
-        const y = Math.random() * (canvas.height - 2 * margin) + margin;
-        
-        // Ensure cities aren't too close together
-        let tooClose = false;
-        for (const city of state.cities) {
-          const distance = calculateDistance(x, y, city.x, city.y);
-          if (distance < state.citySize * 3) {
-            tooClose = true;
-            break;
-          }
-        }
-        
-        if (!tooClose) {
-          state.cities.push({ x, y, id: i });
-        } else {
-          // Try again for this city
-          i--;
-        }
-      }
-      
-      // Update stats
-      totalCitiesElement.textContent = state.cities.length;
-      citiesVisitedElement.textContent = 0;
-      currentLengthElement.textContent = "0";
-      
-      if (state.bestPathLength !== Infinity) {
-        bestLengthElement.textContent = state.bestPathLength.toFixed(2);
-      } else {
-        bestLengthElement.textContent = "N/A";
-      }
-      
-      // Disable undo button
-      undoButton.disabled = true;
-      
-      // Precalculate nearest neighbor solution
-      calculateNearestNeighborSolution();
-      nnLengthElement.textContent = calculatePathLength(state.nearestNeighborPath).toFixed(2);
-      
-      // Precalculate "optimal" solution (2-opt)
-      calculateOptimalSolution();
-      optimalLengthElement.textContent = calculatePathLength(state.optimalPath).toFixed(2);
-      
-      drawGame();
-      state.gameStarted = true;
-    }
-
-    // Clear best path
-    function clearBestPath() {
-      state.bestPathLength = Infinity;
-      state.bestPath = [];
-      bestLengthElement.textContent = "N/A";
-    }
-
-    // Handle canvas clicks
-    function handleCanvasClick(event) {
-      if (!state.gameStarted) return;
-      
-      const rect = canvas.getBoundingClientRect();
-      const x = (event.clientX - rect.left) * (canvas.width / rect.width);
-      const y = (event.clientY - rect.top) * (canvas.height / rect.height);
-      
-      // Find if a city was clicked
-      for (const city of state.cities) {
-        const dx = city.x - x;
-        const dy = city.y - y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < state.citySize + 5) {
-          // Check if clicking on the first city to complete the tour
-          if (state.path.length === state.cities.length - 1 && !state.path.includes(city.id)) {
-            addCityToPath(city.id);
-            // Add the first city again to complete the tour
-            addCityToPath(state.path[0]);
-            
-            // Check if this is the best path so far
-            const pathLength = calculatePathLength(state.path);
-            if (pathLength < state.bestPathLength) {
-              state.bestPathLength = pathLength;
-              state.bestPath = [...state.path];
-              bestLengthElement.textContent = state.bestPathLength.toFixed(2);
-            }
-            
-            // Compare with algorithm solutions
-            const nnLength = calculatePathLength(state.nearestNeighborPath);
-            const optimalLength = calculatePathLength(state.optimalPath);
-            
-            let message = `Tour completed! Your path length: ${pathLength.toFixed(2)}\n`;
-            message += `Nearest Neighbor: ${nnLength.toFixed(2)}\n`;
-            message += `2-Opt Solution: ${optimalLength.toFixed(2)}\n\n`;
-            
-            if (pathLength <= optimalLength) {
-              message += "Impressive! You beat or matched the 2-Opt algorithm!";
-            } else if (pathLength <= nnLength) {
-              message += "Great job! You beat the Nearest Neighbor algorithm!";
-            } else {
-              message += "Keep trying! Can you beat the algorithms?";
-            }
-            
-            setTimeout(() => {
-              alert(message);
-            }, 100);
-          } 
-          // Check if the city is not already in the path (except for completing the tour)
-          else if (!state.path.includes(city.id)) {
-            addCityToPath(city.id);
-          }
-          
-          break;
-        }
-      }
-    }
-
-    // Add a city to the path
-    function addCityToPath(cityId) {
-      state.path.push(cityId);
-      citiesVisitedElement.textContent = Math.min(state.path.length, state.cities.length);
-      
-      // Update current path length
-      if (state.path.length > 1) {
-        const pathLength = calculatePathLength(state.path);
-        currentLengthElement.textContent = pathLength.toFixed(2);
-      }
-      
-      // Enable undo button
-      undoButton.disabled = false;
-      
-      drawGame();
-    }
-
-    // Undo last city
-    function undoLastCity() {
-      if (state.path.length > 0) {
-        state.path.pop();
-        citiesVisitedElement.textContent = state.path.length;
-        
-        // Update current path length
-        if (state.path.length > 1) {
-          const pathLength = calculatePathLength(state.path);
-          currentLengthElement.textContent = pathLength.toFixed(2);
-        } else {
-          currentLengthElement.textContent = "0";
-        }
-        
-        // Disable undo button if path is empty
-        if (state.path.length === 0) {
-          undoButton.disabled = true;
-        }
-        
-        drawGame();
-      }
-    }
-
-    // Reset path
-    function resetPath() {
-      state.path = [];
-      citiesVisitedElement.textContent = 0;
-      currentLengthElement.textContent = "0";
-      undoButton.disabled = true;
-      drawGame();
-    }
-
-    // Calculate nearest neighbor solution
-    function calculateNearestNeighborSolution() {
-      if (state.cities.length === 0) return;
-      
-      const visited = new Array(state.cities.length).fill(false);
-      state.nearestNeighborPath = [0]; // Start with city 0
-      visited[0] = true;
-      
-      while (state.nearestNeighborPath.length < state.cities.length) {
-        const lastCity = state.nearestNeighborPath[state.nearestNeighborPath.length - 1];
-        let nearestCity = -1;
-        let shortestDistance = Infinity;
-        
-        for (let i = 0; i < state.cities.length; i++) {
-          if (!visited[i]) {
-            const distance = calculateDistance(
-              state.cities[lastCity].x, state.cities[lastCity].y,
-              state.cities[i].x, state.cities[i].y
-            );
-            
-            if (distance < shortestDistance) {
-              shortestDistance = distance;
-              nearestCity = i;
-            }
-          }
-        }
-        
-        if (nearestCity !== -1) {
-          state.nearestNeighborPath.push(nearestCity);
-          visited[nearestCity] = true;
-        }
-      }
-      
-      // Return to the starting city
-      state.nearestNeighborPath.push(state.nearestNeighborPath[0]);
-    }
-
-    // Show nearest neighbor solution
-    function showNearestNeighborSolution() {
-      resetPath();
-      
-      // Set path to nearest neighbor solution
-      state.path = [...state.nearestNeighborPath];
-      
-      // Update stats
-      citiesVisitedElement.textContent = Math.min(state.path.length, state.cities.length);
-      
-      if (state.path.length > 1) {
-        const pathLength = calculatePathLength(state.path);
-        currentLengthElement.textContent = pathLength.toFixed(2);
-        
-        // Update best path if this is better
-        if (pathLength < state.bestPathLength) {
-          state.bestPathLength = pathLength;
-          state.bestPath = [...state.path];
-          bestLengthElement.textContent = state.bestPathLength.toFixed(2);
-        }
-      }
-      
-      // Enable undo button
-      undoButton.disabled = false;
-      
-      drawGame();
-    }
-
-    // Calculate a better solution using 2-opt
-    function calculateOptimalSolution() {
-      // Start with nearest neighbor solution
-      state.optimalPath = [...state.nearestNeighborPath];
-      
-      // Apply 2-opt improvement
-      let improvement = true;
-      let iterations = 0;
-      const maxIterations = Math.min(200, state.cities.length * 8); // Adjust based on city count
-      
-      while (improvement && iterations < maxIterations) {
-        improvement = false;
-        iterations++;
-        
-        for (let i = 1; i < state.optimalPath.length - 2; i++) {
-          for (let j = i + 1; j < state.optimalPath.length - 1; j++) {
-            // Check if swapping edges (i-1,i) and (j,j+1) improves the tour
-            const a = state.optimalPath[i-1];
-            const b = state.optimalPath[i];
-            const c = state.optimalPath[j];
-            const d = state.optimalPath[j+1];
-            
-            const d1 = calculateDistance(
-              state.cities[a].x, state.cities[a].y,
-              state.cities[b].x, state.cities[b].y
-            ) + calculateDistance(
-              state.cities[c].x, state.cities[c].y,
-              state.cities[d].x, state.cities[d].y
-            );
-            
-            const d2 = calculateDistance(
-              state.cities[a].x, state.cities[a].y,
-              state.cities[c].x, state.cities[c].y
-            ) + calculateDistance(
-              state.cities[b].x, state.cities[b].y,
-              state.cities[d].x, state.cities[d].y
-            );
-            
-            if (d2 < d1) {
-              // Reverse the path between i and j
-              const reversed = state.optimalPath.slice(i, j + 1).reverse();
-              state.optimalPath.splice(i, (j - i + 1), ...reversed);
-              improvement = true;
-              break; // Small optimization - restart outer loop after change
-            }
-          }
-          if (improvement) break;
-        }
-      }
-    }
-
-    // Show "optimal" solution
-    function showOptimalSolution() {
-      resetPath();
-      
-      // Set path to optimal solution
-      state.path = [...state.optimalPath];
-      
-      // Update stats
-      citiesVisitedElement.textContent = Math.min(state.path.length, state.cities.length);
-      
-      if (state.path.length > 1) {
-        const pathLength = calculatePathLength(state.path);
-        currentLengthElement.textContent = pathLength.toFixed(2);
-        
-        // Update best path if this is better
-        if (pathLength < state.bestPathLength) {
-          state.bestPathLength = pathLength;
-          state.bestPath = [...state.path];
-          bestLengthElement.textContent = state.bestPathLength.toFixed(2);
-        }
-      }
-      
-      // Enable undo button
-      undoButton.disabled = false;
-      
-      drawGame();
-    }
-
-    // Draw the game
-    function drawGame() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw edges in the path
-      if (state.path.length > 1) {
-        ctx.strokeStyle = '#3498db';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        
-        const startCity = state.cities[state.path[0]];
-        ctx.moveTo(startCity.x, startCity.y);
-        
-        for (let i = 1; i < state.path.length; i++) {
-          const city = state.cities[state.path[i]];
-          ctx.lineTo(city.x, city.y);
-        }
-        
-        ctx.stroke();
-      }
-      
-      // Draw cities
-      for (let i = 0; i < state.cities.length; i++) {
-        const city = state.cities[i];
-        
-        // Different appearance for cities in the path
-        if (state.path.includes(i)) {
-          const index = state.path.indexOf(i);
-          
-          // Different color for first and last city in path
-          if (index === 0 || (index === state.path.length - 1 && state.path[0] === state.path[state.path.length - 1])) {
-            ctx.fillStyle = '#27ae60'; // Green for start/end
-          } else {
-            ctx.fillStyle = '#3498db'; // Blue for visited
-          }
-        } else {
-          ctx.fillStyle = '#e74c3c'; // Red for unvisited
-        }
-        
-        // Add glow for current city
-        if (state.path.length > 0 && i === state.path[state.path.length - 1]) {
-          ctx.shadowColor = '#f39c12';
-          ctx.shadowBlur = 15;
-        } else {
-          ctx.shadowBlur = 0;
-        }
-        
-        ctx.beginPath();
-        ctx.arc(city.x, city.y, state.citySize, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Draw city number
-        ctx.fillStyle = 'white';
-        ctx.font = `${Math.max(10, state.citySize - 2)}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(i.toString(), city.x, city.y);
-      }
-      
-      // Reset shadow
-      ctx.shadowBlur = 0;
-    }
-
-    // Start a new game
-    function startNewGame() {
-      initGame();
-    }
-
-    // Calculate distance between two points
-    function calculateDistance(x1, y1, x2, y2) {
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    // Calculate total path length
-    function calculatePathLength(path) {
-      if (!path || path.length <= 1) return 0;
-      
-      let length = 0;
-      
-      for (let i = 0; i < path.length - 1; i++) {
-        const city1 = state.cities[path[i]];
-        const city2 = state.cities[path[i + 1]];
-        length += calculateDistance(city1.x, city1.y, city2.x, city2.y);
-      }
-      
-      return length;
-    }
-
-    // Start the game
-    initGame();
-  </script>
+  <!-- Note the "type=module" which enables ES modules -->
+  <script type="module" src="assets/js/main.js"></script>
 </body>
+
 </html>
