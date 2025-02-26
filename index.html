@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TSP Game</title>
+  <title>Traveling Salesperson Game</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -11,19 +11,21 @@
       margin: 0 auto;
       padding: 20px;
       background-color: #f5f5f5;
+      line-height: 1.6;
     }
     
     h1 {
       text-align: center;
       color: #2c3e50;
+      margin-bottom: 20px;
     }
     
     .game-container {
       background-color: white;
       border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       padding: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
     
     canvas {
@@ -32,49 +34,72 @@
       background-color: #f8f9fa;
       border: 1px solid #dee2e6;
       border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
     
     .controls {
       display: flex;
       justify-content: space-between;
-      margin-top: 15px;
+      margin-top: 20px;
       flex-wrap: wrap;
+      gap: 10px;
     }
     
     .control-group {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
     
     button {
       background-color: #3498db;
       color: white;
       border: none;
-      padding: 8px 15px;
+      padding: 10px 15px;
       border-radius: 4px;
       cursor: pointer;
-      margin-right: 5px;
+      margin-right: 8px;
       font-size: 14px;
-      transition: background-color 0.2s;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     
     button:hover {
       background-color: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    button:active {
+      transform: translateY(0);
     }
     
     button:disabled {
       background-color: #95a5a6;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
     
     .stats {
-      margin-top: 15px;
-      padding: 10px;
-      background-color: #eee;
-      border-radius: 4px;
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f1f5f9;
+      border-radius: 6px;
+      border-left: 4px solid #3498db;
     }
     
     .game-instructions {
-      margin-top: 20px;
+      margin-top: 30px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .game-instructions h2 {
+      color: #2c3e50;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
     }
     
     .best-path {
@@ -88,30 +113,89 @@
     }
     
     #difficulty-select {
-      padding: 8px;
+      padding: 10px;
       border-radius: 4px;
       border: 1px solid #ddd;
+      background-color: white;
+      font-size: 14px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
     
     .slider-container {
       display: flex;
       align-items: center;
-      margin-top: 10px;
+      margin: 15px 0;
     }
     
     .slider-container label {
-      margin-right: 10px;
+      margin-right: 15px;
       min-width: 80px;
+      font-weight: bold;
+      color: #2c3e50;
     }
     
     input[type="range"] {
       flex-grow: 1;
+      height: 8px;
+      accent-color: #3498db;
     }
     
     .value-display {
-      margin-left: 10px;
-      min-width: 40px;
-      text-align: right;
+      margin-left: 15px;
+      min-width: 30px;
+      text-align: center;
+      background: #3498db;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      margin-left: 5px;
+      cursor: help;
+    }
+    
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+    
+    @media (max-width: 600px) {
+      .controls {
+        flex-direction: column;
+      }
+      
+      canvas {
+        width: 100%;
+        height: auto;
+      }
     }
   </style>
 </head>
@@ -126,7 +210,12 @@
         <option value="medium" selected>Medium (15 cities)</option>
         <option value="hard">Hard (25 cities)</option>
         <option value="expert">Expert (40 cities)</option>
+        <option value="custom">Custom</option>
       </select>
+      <div id="custom-cities-container" style="display: none; margin-top: 10px;">
+        <label for="custom-cities">Number of cities:</label>
+        <input type="number" id="custom-cities" min="5" max="100" value="20">
+      </div>
       <button id="new-game-btn">New Game</button>
     </div>
     
@@ -142,11 +231,15 @@
       <div class="control-group">
         <button id="reset-path-btn">Reset Path</button>
         <button id="undo-btn" disabled>Undo Last</button>
+        <button id="clear-best-btn">Clear Best Path</button>
       </div>
       
       <div class="control-group">
-        <button id="nearest-neighbor-btn">Nearest Neighbor Solution</button>
-        <button id="optimal-btn">Show Optimal</button>
+        <button id="nearest-neighbor-btn" title="Quick approximation algorithm">Nearest Neighbor Solution</button>
+        <button id="optimal-btn" title="2-opt improvement algorithm">Show 2-Opt Solution</button>
+        <span class="tooltip">?
+          <span class="tooltip-text">2-opt is a local optimization technique that improves a tour by swapping edges</span>
+        </span>
       </div>
     </div>
     
@@ -154,6 +247,8 @@
       <p>Cities visited: <span id="cities-visited">0</span> / <span id="total-cities">15</span></p>
       <p>Current path length: <span id="current-length" class="current-path">0</span></p>
       <p>Best path length so far: <span id="best-length" class="best-path">N/A</span></p>
+      <p>Nearest Neighbor solution: <span id="nn-length">N/A</span></p>
+      <p>2-Opt solution: <span id="optimal-length">N/A</span></p>
     </div>
   </div>
   
@@ -163,11 +258,16 @@
       <li>Click on cities to create a path that visits each city exactly once and returns to the starting city.</li>
       <li>Try to find the shortest possible path (the optimal solution to the TSP).</li>
       <li>Use the "Nearest Neighbor Solution" button to see a quick approximation.</li>
-      <li>Use the "Show Optimal" button to see a high-quality solution (not guaranteed to be optimal for larger problems).</li>
-      <li>Adjust difficulty to change the number of cities.</li>
+      <li>Use the "Show 2-Opt Solution" button to see a higher-quality solution (not guaranteed to be optimal for larger problems).</li>
+      <li>Adjust difficulty to change the number of cities or set a custom number.</li>
     </ol>
     <p>The Traveling Salesperson Problem is famously difficult - finding the absolute optimal solution for large numbers of cities is computationally intensive!</p>
+    <p>This problem is <strong>NP-hard</strong>, which means the time required to solve it grows exponentially with the number of cities. For just 20 cities, there are over 60 quintillion possible routes!</p>
   </div>
+
+  <footer>
+    <p>© 2025 TSP Game | <a href="https://github.com/yourusername/tsp_game" target="_blank">View on GitHub</a></p>
+  </footer>
 
   <script>
     // Game state
@@ -184,7 +284,8 @@
         easy: 10,
         medium: 15,
         hard: 25,
-        expert: 40
+        expert: 40,
+        custom: 20
       }
     };
 
@@ -195,25 +296,66 @@
     const totalCitiesElement = document.getElementById('total-cities');
     const currentLengthElement = document.getElementById('current-length');
     const bestLengthElement = document.getElementById('best-length');
+    const nnLengthElement = document.getElementById('nn-length');
+    const optimalLengthElement = document.getElementById('optimal-length');
     const undoButton = document.getElementById('undo-btn');
     const resetPathButton = document.getElementById('reset-path-btn');
+    const clearBestButton = document.getElementById('clear-best-btn');
     const nearestNeighborButton = document.getElementById('nearest-neighbor-btn');
     const optimalButton = document.getElementById('optimal-btn');
     const newGameButton = document.getElementById('new-game-btn');
     const difficultySelect = document.getElementById('difficulty-select');
+    const customCitiesContainer = document.getElementById('custom-cities-container');
+    const customCitiesInput = document.getElementById('custom-cities');
     const citySizeInput = document.getElementById('city-size');
     const citySizeValue = document.getElementById('city-size-value');
+
+    // Make canvas responsive
+    function resizeCanvas() {
+      const container = document.querySelector('.game-container');
+      const containerWidth = container.clientWidth - 40; // Minus padding
+      
+      if (window.innerWidth <= 800) {
+        canvas.width = containerWidth;
+        canvas.height = containerWidth * 0.6;
+        
+        if (state.gameStarted) {
+          drawGame();
+        }
+      }
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
     // Event listeners
     canvas.addEventListener('click', handleCanvasClick);
     undoButton.addEventListener('click', undoLastCity);
     resetPathButton.addEventListener('click', resetPath);
+    clearBestButton.addEventListener('click', clearBestPath);
     nearestNeighborButton.addEventListener('click', showNearestNeighborSolution);
     optimalButton.addEventListener('click', showOptimalSolution);
     newGameButton.addEventListener('click', startNewGame);
+    
     difficultySelect.addEventListener('change', () => {
       const selectedDifficulty = difficultySelect.value;
-      totalCitiesElement.textContent = state.difficulty[selectedDifficulty];
+      if (selectedDifficulty === 'custom') {
+        customCitiesContainer.style.display = 'block';
+        state.difficulty.custom = parseInt(customCitiesInput.value);
+        totalCitiesElement.textContent = state.difficulty.custom;
+      } else {
+        customCitiesContainer.style.display = 'none';
+        totalCitiesElement.textContent = state.difficulty[selectedDifficulty];
+      }
+    });
+    
+    customCitiesInput.addEventListener('change', () => {
+      let value = parseInt(customCitiesInput.value);
+      // Ensure value is between 5 and 100
+      value = Math.max(5, Math.min(100, value));
+      customCitiesInput.value = value;
+      state.difficulty.custom = value;
+      totalCitiesElement.textContent = value;
     });
     
     citySizeInput.addEventListener('input', (e) => {
@@ -231,37 +373,74 @@
       state.path = [];
       state.optimalPath = [];
       state.nearestNeighborPath = [];
-      state.bestPathLength = Infinity;
-      state.bestPath = [];
+      
+      // Keep best path between games if not cleared
       
       const difficultyValue = difficultySelect.value;
-      const numCities = state.difficulty[difficultyValue];
+      let numCities;
+      
+      if (difficultyValue === 'custom') {
+        numCities = parseInt(customCitiesInput.value);
+        state.difficulty.custom = numCities;
+      } else {
+        numCities = state.difficulty[difficultyValue];
+      }
       
       // Generate random cities
       for (let i = 0; i < numCities; i++) {
-        const margin = 30;
+        const margin = Math.max(30, state.citySize * 2);
         const x = Math.random() * (canvas.width - 2 * margin) + margin;
         const y = Math.random() * (canvas.height - 2 * margin) + margin;
-        state.cities.push({ x, y, id: i });
+        
+        // Ensure cities aren't too close together
+        let tooClose = false;
+        for (const city of state.cities) {
+          const distance = calculateDistance(x, y, city.x, city.y);
+          if (distance < state.citySize * 3) {
+            tooClose = true;
+            break;
+          }
+        }
+        
+        if (!tooClose) {
+          state.cities.push({ x, y, id: i });
+        } else {
+          // Try again for this city
+          i--;
+        }
       }
       
       // Update stats
       totalCitiesElement.textContent = state.cities.length;
       citiesVisitedElement.textContent = 0;
       currentLengthElement.textContent = "0";
-      bestLengthElement.textContent = "N/A";
+      
+      if (state.bestPathLength !== Infinity) {
+        bestLengthElement.textContent = state.bestPathLength.toFixed(2);
+      } else {
+        bestLengthElement.textContent = "N/A";
+      }
       
       // Disable undo button
       undoButton.disabled = true;
       
       // Precalculate nearest neighbor solution
       calculateNearestNeighborSolution();
+      nnLengthElement.textContent = calculatePathLength(state.nearestNeighborPath).toFixed(2);
       
       // Precalculate "optimal" solution (2-opt)
       calculateOptimalSolution();
+      optimalLengthElement.textContent = calculatePathLength(state.optimalPath).toFixed(2);
       
       drawGame();
       state.gameStarted = true;
+    }
+
+    // Clear best path
+    function clearBestPath() {
+      state.bestPathLength = Infinity;
+      state.bestPath = [];
+      bestLengthElement.textContent = "N/A";
     }
 
     // Handle canvas clicks
@@ -269,8 +448,8 @@
       if (!state.gameStarted) return;
       
       const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      const x = (event.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (event.clientY - rect.top) * (canvas.height / rect.height);
       
       // Find if a city was clicked
       for (const city of state.cities) {
@@ -293,11 +472,24 @@
               bestLengthElement.textContent = state.bestPathLength.toFixed(2);
             }
             
-            // Disable further clicks until reset
-            canvas.removeEventListener('click', handleCanvasClick);
+            // Compare with algorithm solutions
+            const nnLength = calculatePathLength(state.nearestNeighborPath);
+            const optimalLength = calculatePathLength(state.optimalPath);
+            
+            let message = `Tour completed! Your path length: ${pathLength.toFixed(2)}\n`;
+            message += `Nearest Neighbor: ${nnLength.toFixed(2)}\n`;
+            message += `2-Opt Solution: ${optimalLength.toFixed(2)}\n\n`;
+            
+            if (pathLength <= optimalLength) {
+              message += "Impressive! You beat or matched the 2-Opt algorithm!";
+            } else if (pathLength <= nnLength) {
+              message += "Great job! You beat the Nearest Neighbor algorithm!";
+            } else {
+              message += "Keep trying! Can you beat the algorithms?";
+            }
+            
             setTimeout(() => {
-              alert("Tour completed! Path length: " + pathLength.toFixed(2));
-              canvas.addEventListener('click', handleCanvasClick);
+              alert(message);
             }, 100);
           } 
           // Check if the city is not already in the path (except for completing the tour)
@@ -432,7 +624,7 @@
       // Apply 2-opt improvement
       let improvement = true;
       let iterations = 0;
-      const maxIterations = 150; // Limit iterations for larger problems
+      const maxIterations = Math.min(200, state.cities.length * 8); // Adjust based on city count
       
       while (improvement && iterations < maxIterations) {
         improvement = false;
@@ -467,8 +659,10 @@
               const reversed = state.optimalPath.slice(i, j + 1).reverse();
               state.optimalPath.splice(i, (j - i + 1), ...reversed);
               improvement = true;
+              break; // Small optimization - restart outer loop after change
             }
           }
+          if (improvement) break;
         }
       }
     }
@@ -488,9 +682,11 @@
         currentLengthElement.textContent = pathLength.toFixed(2);
         
         // Update best path if this is better
-        state.bestPathLength = pathLength;
-        state.bestPath = [...state.path];
-        bestLengthElement.textContent = state.bestPathLength.toFixed(2);
+        if (pathLength < state.bestPathLength) {
+          state.bestPathLength = pathLength;
+          state.bestPath = [...state.path];
+          bestLengthElement.textContent = state.bestPathLength.toFixed(2);
+        }
       }
       
       // Enable undo button
@@ -506,7 +702,7 @@
       // Draw edges in the path
       if (state.path.length > 1) {
         ctx.strokeStyle = '#3498db';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         
         const startCity = state.cities[state.path[0]];
@@ -529,13 +725,21 @@
           const index = state.path.indexOf(i);
           
           // Different color for first and last city in path
-          if (index === 0 || index === state.path.length - 1 && state.path[0] === state.path[state.path.length - 1]) {
+          if (index === 0 || (index === state.path.length - 1 && state.path[0] === state.path[state.path.length - 1])) {
             ctx.fillStyle = '#27ae60'; // Green for start/end
           } else {
             ctx.fillStyle = '#3498db'; // Blue for visited
           }
         } else {
           ctx.fillStyle = '#e74c3c'; // Red for unvisited
+        }
+        
+        // Add glow for current city
+        if (state.path.length > 0 && i === state.path[state.path.length - 1]) {
+          ctx.shadowColor = '#f39c12';
+          ctx.shadowBlur = 15;
+        } else {
+          ctx.shadowBlur = 0;
         }
         
         ctx.beginPath();
@@ -549,6 +753,9 @@
         ctx.textBaseline = 'middle';
         ctx.fillText(i.toString(), city.x, city.y);
       }
+      
+      // Reset shadow
+      ctx.shadowBlur = 0;
     }
 
     // Start a new game
@@ -565,6 +772,8 @@
 
     // Calculate total path length
     function calculatePathLength(path) {
+      if (!path || path.length <= 1) return 0;
+      
       let length = 0;
       
       for (let i = 0; i < path.length - 1; i++) {
