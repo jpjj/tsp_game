@@ -17,11 +17,13 @@ export function getDomElements() {
         bestLengthElement: document.getElementById('best-length'),
         nnLengthElement: document.getElementById('nn-length'),
         optimalLengthElement: document.getElementById('optimal-length'),
+        enhancedLengthElement: document.getElementById('enhanced-length'), // Added for enhanced algorithm
         undoButton: document.getElementById('undo-btn'),
         resetPathButton: document.getElementById('reset-path-btn'),
         clearBestButton: document.getElementById('clear-best-btn'),
         nearestNeighborButton: document.getElementById('nearest-neighbor-btn'),
         optimalButton: document.getElementById('optimal-btn'),
+        enhancedButton: document.getElementById('enhanced-btn'), // Added for enhanced algorithm
         newGameButton: document.getElementById('new-game-btn'),
         difficultySelect: document.getElementById('difficulty-select'),
         customCitiesContainer: document.getElementById('custom-cities-container'),
@@ -69,4 +71,42 @@ export function formatNumber(value, decimals = 2) {
  */
 export function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * Measures the execution time of a function
+ * @param {Function} fn - The function to measure
+ * @param {...any} args - Arguments to pass to the function
+ * @returns {Object} Object containing the result and execution time
+ */
+export function measureExecutionTime(fn, ...args) {
+    const startTime = performance.now();
+    const result = fn(...args);
+    const endTime = performance.now();
+    const executionTime = endTime - startTime;
+
+    return {
+        result,
+        executionTime
+    };
+}
+
+/**
+ * Creates a throttled function that only invokes the provided function at most once per specified interval
+ * @param {Function} func - The function to throttle
+ * @param {number} limit - Throttle interval in milliseconds
+ * @returns {Function} Throttled function
+ */
+export function throttle(func, limit) {
+    let inThrottle;
+
+    return function (...args) {
+        const context = this;
+
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
 }

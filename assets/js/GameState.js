@@ -15,6 +15,7 @@ class GameState {
         this.path = [];
         this.optimalPath = [];
         this.nearestNeighborPath = [];
+        this.enhancedPath = []; // Added for the enhanced algorithm
         this.bestPathLength = Infinity;
         this.bestPath = [];
         this.citySize = 8;
@@ -41,6 +42,7 @@ class GameState {
         this.path = [];
         this.optimalPath = [];
         this.nearestNeighborPath = [];
+        this.enhancedPath = []; // Reset enhanced path
 
         // Keep best path between games if not cleared
 
@@ -181,7 +183,8 @@ class GameState {
                         pathLength: pathLength,
                         newBest: newBest,
                         nnLength: this.calculatePathLength(this.nearestNeighborPath),
-                        optimalLength: this.calculatePathLength(this.optimalPath)
+                        optimalLength: this.calculatePathLength(this.optimalPath),
+                        enhancedLength: this.enhancedPath.length > 0 ? this.calculatePathLength(this.enhancedPath) : Infinity
                     };
                 }
                 // Check if the city is not already in the path (except for completing the tour)

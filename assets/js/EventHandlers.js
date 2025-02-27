@@ -28,6 +28,7 @@ class EventHandlers {
         this.handleClearBestClick = this.handleClearBestClick.bind(this);
         this.handleNearestNeighborClick = this.handleNearestNeighborClick.bind(this);
         this.handleOptimalClick = this.handleOptimalClick.bind(this);
+        this.handleEnhancedClick = this.handleEnhancedClick.bind(this); // New handler for enhanced solution
         this.handleNewGameClick = this.handleNewGameClick.bind(this);
         this.handleDifficultyChange = this.handleDifficultyChange.bind(this);
         this.handleCustomCitiesChange = this.handleCustomCitiesChange.bind(this);
@@ -48,6 +49,7 @@ class EventHandlers {
         this.dom.clearBestButton.addEventListener('click', this.handleClearBestClick);
         this.dom.nearestNeighborButton.addEventListener('click', this.handleNearestNeighborClick);
         this.dom.optimalButton.addEventListener('click', this.handleOptimalClick);
+        this.dom.enhancedButton.addEventListener('click', this.handleEnhancedClick); // New button for enhanced solution
         this.dom.newGameButton.addEventListener('click', this.handleNewGameClick);
 
         // Select and input events
@@ -69,6 +71,7 @@ class EventHandlers {
         this.dom.clearBestButton.removeEventListener('click', this.handleClearBestClick);
         this.dom.nearestNeighborButton.removeEventListener('click', this.handleNearestNeighborClick);
         this.dom.optimalButton.removeEventListener('click', this.handleOptimalClick);
+        this.dom.enhancedButton.removeEventListener('click', this.handleEnhancedClick);
         this.dom.newGameButton.removeEventListener('click', this.handleNewGameClick);
         this.dom.difficultySelect.removeEventListener('change', this.handleDifficultyChange);
         this.dom.customCitiesInput.removeEventListener('change', this.handleCustomCitiesChange);
@@ -109,9 +112,18 @@ class EventHandlers {
                 // Show completion message
                 let message = `Tour completed! Your path length: ${result.pathLength.toFixed(2)}\n`;
                 message += `Nearest Neighbor: ${result.nnLength.toFixed(2)}\n`;
-                message += `2-Opt Solution: ${result.optimalLength.toFixed(2)}\n\n`;
+                message += `2-Opt Solution: ${result.optimalLength.toFixed(2)}\n`;
 
-                if (result.pathLength <= result.optimalLength) {
+                // If enhanced solution is calculated, include it in the message
+                if (result.enhancedLength !== Infinity) {
+                    message += `Enhanced Solution: ${result.enhancedLength.toFixed(2)}\n\n`;
+                } else {
+                    message += '\n';
+                }
+
+                if (result.enhancedLength !== Infinity && result.pathLength <= result.enhancedLength) {
+                    message += "Outstanding! You beat or matched the Enhanced algorithm!";
+                } else if (result.pathLength <= result.optimalLength) {
                     message += "Impressive! You beat or matched the 2-Opt algorithm!";
                 } else if (result.pathLength <= result.nnLength) {
                     message += "Great job! You beat the Nearest Neighbor algorithm!";
@@ -211,6 +223,41 @@ class EventHandlers {
     }
 
     /**
+     * Handle enhanced button click
+     */
+    handleEnhancedClick() {
+        // Show calculating indicator on the button
+        const originalText = this.dom.enhancedButton.textContent;
+        this.dom.enhancedButton.textContent = "Calculating...";
+        this.dom.enhancedButton.disabled = true;
+
+        // Use setTimeout to allow the UI to update before the intensive calculation
+        setTimeout(() => {
+            this.gameState.resetPath();
+
+            // Apply the enhanced solution
+            const pathLength = this.algorithms.applyEnhancedSolution();
+
+            // Update UI
+            this.dom.citiesVisitedElement.textContent = this.gameState.path.length - 1; // -1 because last city is repeated
+            this.dom.currentLengthElement.textContent = pathLength.toFixed(2);
+            this.dom.enhancedLengthElement.textContent = pathLength.toFixed(2);
+
+            // Update best path display
+            this.dom.bestLengthElement.textContent = pathLength.toFixed(2);
+
+            // Enable undo button
+            this.dom.undoButton.disabled = false;
+
+            // Reset button text and state
+            this.dom.enhancedButton.textContent = originalText;
+            this.dom.enhancedButton.disabled = false;
+
+            this.renderer.drawGame();
+        }, 10); // Short delay to allow UI update
+    }
+
+    /**
      * Handle new game button click
      */
     handleNewGameClick() {
@@ -247,6 +294,7 @@ class EventHandlers {
             this.gameState.calculatePathLength(this.gameState.nearestNeighborPath).toFixed(2);
         this.dom.optimalLengthElement.textContent =
             this.gameState.calculatePathLength(this.gameState.optimalPath).toFixed(2);
+        this.dom.enhancedLengthElement.textContent = "N/A"; // Reset enhanced length
 
         this.renderer.drawGame();
     }
