@@ -74,14 +74,18 @@
         width: 100%;
     }
 
-    /* Slider controls */
+    /* Slider styles */
     .slider-container {
-        flex-direction: column;
-        align-items: flex-start;
+        display: flex;
+        align-items: center;
+        margin: 15px 0;
     }
 
     .slider-container label {
-        margin-bottom: 0.5rem;
+        margin-right: 15px;
+        min-width: 80px;
+        font-weight: bold;
+        color: #2c3e50;
     }
 
     input[type="range"] {
