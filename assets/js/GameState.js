@@ -1,6 +1,6 @@
 /**
  * GameState.js
- * Manages the state of the TSP game
+ * Manages the state of the TSP game with mobile improvements
  */
 
 /**
@@ -20,6 +20,8 @@ class GameState {
         this.bestPath = [];
         this.citySize = 8;
         this.gameStarted = false;
+        this.touchRadius = 30; // Larger click/touch detection radius for mobile
+        this.isMobile = this.detectMobile();
         this.difficulty = {
             easy: 10,
             medium: 15,
@@ -27,6 +29,20 @@ class GameState {
             expert: 40,
             custom: 20
         };
+
+        // Adjust city size for mobile
+        if (this.isMobile) {
+            this.citySize = Math.max(10, this.citySize);
+        }
+    }
+
+    /**
+     * Detect if the device is mobile
+     * @returns {boolean} True if the device is likely mobile
+     */
+    detectMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+            || window.innerWidth <= 768;
     }
 
     /**
@@ -62,34 +78,82 @@ class GameState {
     }
 
     /**
-     * Generate random cities for the game
+     * Generate random cities for the game with improved mobile performance
      * @param {number} numCities - Number of cities to generate
      * @param {number} canvasWidth - Canvas width
      * @param {number} canvasHeight - Canvas height
      */
     generateCities(numCities, canvasWidth, canvasHeight) {
+        // Calculate minimum distance between cities based on device type
+        // Reduced minimum distance on mobile devices
+        const minimumDistance = this.isMobile ? this.citySize * 2.5 : this.citySize * 3;
+
+        // Set a maximum retry count to avoid infinite loops
+        const maxRetries = 50;
+
         for (let i = 0; i < numCities; i++) {
             const margin = Math.max(30, this.citySize * 2);
-            const x = Math.random() * (canvasWidth - 2 * margin) + margin;
-            const y = Math.random() * (canvasHeight - 2 * margin) + margin;
+            let retryCount = 0;
+            let validPositionFound = false;
 
-            // Ensure cities aren't too close together
-            let tooClose = false;
-            for (const city of this.cities) {
-                const distance = this.calculateDistance(x, y, city.x, city.y);
-                if (distance < this.citySize * 3) {
-                    tooClose = true;
-                    break;
+            while (!validPositionFound && retryCount < maxRetries) {
+                retryCount++;
+
+                // Generate a random position
+                const x = Math.random() * (canvasWidth - 2 * margin) + margin;
+                const y = Math.random() * (canvasHeight - 2 * margin) + margin;
+
+                // Ensure cities aren't too close together
+                let tooClose = false;
+
+                // When we have many cities, only check against nearby cities
+                // This significantly improves performance
+                const citiesToCheck = this.cities.length > 15 ? this.getNearestCities(x, y, 15) : this.cities;
+
+                for (const city of citiesToCheck) {
+                    const distance = this.calculateDistance(x, y, city.x, city.y);
+                    if (distance < minimumDistance) {
+                        tooClose = true;
+                        break;
+                    }
+                }
+
+                if (!tooClose) {
+                    this.cities.push({ x, y, id: i });
+                    validPositionFound = true;
                 }
             }
 
-            if (!tooClose) {
+            // If we couldn't find a valid position after maxRetries,
+            // place the city anyway but with less strict distance requirements
+            if (!validPositionFound) {
+                const x = Math.random() * (canvasWidth - 2 * margin) + margin;
+                const y = Math.random() * (canvasHeight - 2 * margin) + margin;
                 this.cities.push({ x, y, id: i });
-            } else {
-                // Try again for this city
-                i--;
             }
         }
+    }
+
+    /**
+     * Get the nearest cities to a point to optimize collision checking
+     * @param {number} x - X coordinate
+     * @param {number} y - Y coordinate
+     * @param {number} count - Number of cities to return
+     * @returns {Array} Array of nearest cities
+     */
+    getNearestCities(x, y, count) {
+        if (this.cities.length <= count) return this.cities;
+
+        // Calculate distances to all cities
+        const withDistances = this.cities.map(city => ({
+            city: city,
+            distance: this.calculateDistance(x, y, city.x, city.y)
+        }));
+
+        // Sort by distance and take the closest 'count' cities
+        withDistances.sort((a, b) => a.distance - b.distance);
+
+        return withDistances.slice(0, count).map(item => item.city);
     }
 
     /**
@@ -154,52 +218,66 @@ class GameState {
      * @returns {Object|null} Result of the click action or null if no city clicked
      */
     handleCityClick(x, y) {
-        // Find if a city was clicked
+        // Find if a city was clicked - use a larger touch radius on mobile
+        const hitRadius = this.isMobile ? this.touchRadius : this.citySize + 5;
+
+        // Find the closest city within the hit radius
+        let closestCity = null;
+        let minDistance = hitRadius;
+
         for (const city of this.cities) {
             const dx = city.x - x;
             const dy = city.y - y;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (distance < this.citySize + 5) {
-                // Check if clicking on the first city to complete the tour
-                if (this.path.length === this.cities.length - 1 && !this.path.includes(city.id)) {
-                    // Add the clicked city
-                    this.addCityToPath(city.id);
-                    // Add the first city again to complete the tour
-                    this.addCityToPath(this.path[0]);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestCity = city;
+            }
+        }
 
-                    // Check if this is the best path so far
-                    const pathLength = this.calculatePathLength(this.path);
-                    let newBest = false;
+        // If we found a city within the hit radius
+        if (closestCity) {
+            const city = closestCity;
 
-                    if (pathLength < this.bestPathLength) {
-                        this.bestPathLength = pathLength;
-                        this.bestPath = [...this.path];
-                        newBest = true;
-                    }
+            // Check if clicking on the first city to complete the tour
+            if (this.path.length === this.cities.length - 1 && !this.path.includes(city.id)) {
+                // Add the clicked city
+                this.addCityToPath(city.id);
+                // Add the first city again to complete the tour
+                this.addCityToPath(this.path[0]);
 
-                    return {
-                        action: 'complete-tour',
-                        pathLength: pathLength,
-                        newBest: newBest,
-                        nnLength: this.calculatePathLength(this.nearestNeighborPath),
-                        optimalLength: this.calculatePathLength(this.optimalPath),
-                        enhancedLength: this.enhancedPath.length > 0 ? this.calculatePathLength(this.enhancedPath) : Infinity
-                    };
-                }
-                // Check if the city is not already in the path (except for completing the tour)
-                else if (!this.path.includes(city.id)) {
-                    const pathLength = this.addCityToPath(city.id);
-                    return {
-                        action: 'add-city',
-                        pathLength: pathLength
-                    };
+                // Check if this is the best path so far
+                const pathLength = this.calculatePathLength(this.path);
+                let newBest = false;
+
+                if (pathLength < this.bestPathLength) {
+                    this.bestPathLength = pathLength;
+                    this.bestPath = [...this.path];
+                    newBest = true;
                 }
 
                 return {
-                    action: 'already-visited'
+                    action: 'complete-tour',
+                    pathLength: pathLength,
+                    newBest: newBest,
+                    nnLength: this.calculatePathLength(this.nearestNeighborPath),
+                    optimalLength: this.calculatePathLength(this.optimalPath),
+                    enhancedLength: this.enhancedPath.length > 0 ? this.calculatePathLength(this.enhancedPath) : Infinity
                 };
             }
+            // Check if the city is not already in the path (except for completing the tour)
+            else if (!this.path.includes(city.id)) {
+                const pathLength = this.addCityToPath(city.id);
+                return {
+                    action: 'add-city',
+                    pathLength: pathLength
+                };
+            }
+
+            return {
+                action: 'already-visited'
+            };
         }
 
         return null; // No city clicked
@@ -243,7 +321,15 @@ class GameState {
      * @param {number} size - New city size
      */
     updateCitySize(size) {
-        this.citySize = size;
+        // Enforce minimum size for mobile
+        if (this.isMobile) {
+            this.citySize = Math.max(8, size);
+        } else {
+            this.citySize = size;
+        }
+
+        // Update touch radius based on city size
+        this.touchRadius = Math.max(this.citySize * 2, 20);
     }
 }
 

@@ -1,6 +1,6 @@
 /**
  * EventHandlers.js
- * Manages UI event handlers for the TSP game
+ * Updated with improved touch support for mobile devices
  */
 
 /**
@@ -20,15 +20,23 @@ class EventHandlers {
         this.renderer = renderer;
         this.algorithms = algorithms;
         this.dom = domElements;
+        this.isMobile = this.detectMobile();
+        this.touchStartX = 0;
+        this.touchStartY = 0;
+        this.touchMoved = false;
+        this.clickDelay = 300; // ms to wait to distinguish between tap and scroll
 
         // Bind event handlers to maintain 'this' context
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
+        this.handleCanvasTouchStart = this.handleCanvasTouchStart.bind(this);
+        this.handleCanvasTouchMove = this.handleCanvasTouchMove.bind(this);
+        this.handleCanvasTouchEnd = this.handleCanvasTouchEnd.bind(this);
         this.handleUndoClick = this.handleUndoClick.bind(this);
         this.handleResetPathClick = this.handleResetPathClick.bind(this);
         this.handleClearBestClick = this.handleClearBestClick.bind(this);
         this.handleNearestNeighborClick = this.handleNearestNeighborClick.bind(this);
         this.handleOptimalClick = this.handleOptimalClick.bind(this);
-        this.handleEnhancedClick = this.handleEnhancedClick.bind(this); // New handler for enhanced solution
+        this.handleEnhancedClick = this.handleEnhancedClick.bind(this);
         this.handleNewGameClick = this.handleNewGameClick.bind(this);
         this.handleDifficultyChange = this.handleDifficultyChange.bind(this);
         this.handleCustomCitiesChange = this.handleCustomCitiesChange.bind(this);
@@ -37,19 +45,34 @@ class EventHandlers {
     }
 
     /**
+     * Detect if the device is mobile
+     * @returns {boolean} True if the device is likely mobile
+     */
+    detectMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+            || window.innerWidth <= 768;
+    }
+
+    /**
      * Set up all event listeners
      */
     setupEventListeners() {
-        // Canvas events
-        this.dom.canvas.addEventListener('click', this.handleCanvasClick);
+        // Canvas events - different handling for mobile vs desktop
+        if (this.isMobile) {
+            this.dom.canvas.addEventListener('touchstart', this.handleCanvasTouchStart, { passive: false });
+            this.dom.canvas.addEventListener('touchmove', this.handleCanvasTouchMove, { passive: true });
+            this.dom.canvas.addEventListener('touchend', this.handleCanvasTouchEnd);
+        } else {
+            this.dom.canvas.addEventListener('click', this.handleCanvasClick);
+        }
 
-        // Button events
+        // Button events - add touch handling for mobile
         this.dom.undoButton.addEventListener('click', this.handleUndoClick);
         this.dom.resetPathButton.addEventListener('click', this.handleResetPathClick);
         this.dom.clearBestButton.addEventListener('click', this.handleClearBestClick);
         this.dom.nearestNeighborButton.addEventListener('click', this.handleNearestNeighborClick);
         this.dom.optimalButton.addEventListener('click', this.handleOptimalClick);
-        this.dom.enhancedButton.addEventListener('click', this.handleEnhancedClick); // New button for enhanced solution
+        this.dom.enhancedButton.addEventListener('click', this.handleEnhancedClick);
         this.dom.newGameButton.addEventListener('click', this.handleNewGameClick);
 
         // Select and input events
@@ -59,13 +82,27 @@ class EventHandlers {
 
         // Window events
         window.addEventListener('resize', this.handleWindowResize);
+
+        // On mobile, make city size larger by default for better touch targets
+        if (this.isMobile && this.gameState.citySize < 10) {
+            this.gameState.updateCitySize(10);
+            this.dom.citySizeInput.value = 10;
+            this.dom.citySizeValue.textContent = 10;
+        }
     }
 
     /**
      * Remove all event listeners
      */
     removeEventListeners() {
-        this.dom.canvas.removeEventListener('click', this.handleCanvasClick);
+        if (this.isMobile) {
+            this.dom.canvas.removeEventListener('touchstart', this.handleCanvasTouchStart);
+            this.dom.canvas.removeEventListener('touchmove', this.handleCanvasTouchMove);
+            this.dom.canvas.removeEventListener('touchend', this.handleCanvasTouchEnd);
+        } else {
+            this.dom.canvas.removeEventListener('click', this.handleCanvasClick);
+        }
+
         this.dom.undoButton.removeEventListener('click', this.handleUndoClick);
         this.dom.resetPathButton.removeEventListener('click', this.handleResetPathClick);
         this.dom.clearBestButton.removeEventListener('click', this.handleClearBestClick);
@@ -80,8 +117,65 @@ class EventHandlers {
     }
 
     /**
+     * Handle canvas touchstart event
+     * @param {TouchEvent} event - The touchstart event
+     */
+    handleCanvasTouchStart(event) {
+        // Prevent default to avoid page scrolling when interacting with the canvas
+        if (event.cancelable) {
+            event.preventDefault();
+        }
+
+        if (!this.gameState.gameStarted || event.touches.length !== 1) return;
+
+        const touch = event.touches[0];
+        this.touchStartX = touch.clientX;
+        this.touchStartY = touch.clientY;
+        this.touchMoved = false;
+    }
+
+    /**
+     * Handle canvas touchmove event
+     * @param {TouchEvent} event - The touchmove event
+     */
+    handleCanvasTouchMove(event) {
+        if (!this.gameState.gameStarted || event.touches.length !== 1) return;
+
+        const touch = event.touches[0];
+        const moveThreshold = 10; // pixels
+
+        // Check if touch has moved significantly
+        if (Math.abs(touch.clientX - this.touchStartX) > moveThreshold ||
+            Math.abs(touch.clientY - this.touchStartY) > moveThreshold) {
+            this.touchMoved = true;
+        }
+    }
+
+    /**
+     * Handle canvas touchend event
+     * @param {TouchEvent} event - The touchend event
+     */
+    handleCanvasTouchEnd(event) {
+        if (!this.gameState.gameStarted) return;
+
+        // Only handle the touch if it wasn't a scroll attempt
+        if (!this.touchMoved) {
+            // Create a synthetic event to pass to the click handler
+            const syntheticEvent = {
+                clientX: this.touchStartX,
+                clientY: this.touchStartY
+            };
+
+            // Use a small delay to ensure it wasn't the start of a scroll
+            setTimeout(() => {
+                this.handleCanvasClick(syntheticEvent);
+            }, 10);
+        }
+    }
+
+    /**
      * Handle canvas click event
-     * @param {MouseEvent} event - The click event
+     * @param {MouseEvent|Object} event - The click event or synthetic event from touch
      */
     handleCanvasClick(event) {
         if (!this.gameState.gameStarted) return;
@@ -109,7 +203,7 @@ class EventHandlers {
                     this.dom.bestLengthElement.textContent = this.gameState.bestPathLength.toFixed(2);
                 }
 
-                // Show completion message
+                // Show completion message - use a more mobile-friendly approach if on mobile
                 let message = `Tour completed! Your path length: ${result.pathLength.toFixed(2)}\n`;
                 message += `Nearest Neighbor: ${result.nnLength.toFixed(2)}\n`;
                 message += `2-Opt Solution: ${result.optimalLength.toFixed(2)}\n`;
@@ -258,45 +352,134 @@ class EventHandlers {
     }
 
     /**
-     * Handle new game button click
+     * Handle new game button click with improved mobile performance
      */
     handleNewGameClick() {
         const difficultyValue = this.dom.difficultySelect.value;
         const customCityCount = parseInt(this.dom.customCitiesInput.value);
 
-        const numCities = this.gameState.resetGame(
-            difficultyValue,
-            customCityCount,
-            this.dom.canvas.width,
-            this.dom.canvas.height
-        );
-
-        // Update DOM elements
-        this.dom.totalCitiesElement.textContent = numCities;
-        this.dom.citiesVisitedElement.textContent = 0;
-        this.dom.currentLengthElement.textContent = "0";
-
-        if (this.gameState.bestPathLength !== Infinity) {
-            this.dom.bestLengthElement.textContent = this.gameState.bestPathLength.toFixed(2);
-        } else {
-            this.dom.bestLengthElement.textContent = "N/A";
+        // For mobile, limit the maximum number of cities to prevent performance issues
+        let adjustedCustomCityCount = customCityCount;
+        if (this.isMobile && customCityCount > 30) {
+            adjustedCustomCityCount = 30; // Reduce from 50 to 30 for better performance
+            this.dom.customCitiesInput.value = 30;
+            alert("On mobile devices, the maximum number of cities is limited to 30 for performance reasons.");
         }
 
-        // Disable undo button
-        this.dom.undoButton.disabled = true;
+        // Show loading indicator
+        this.showLoadingIndicator();
 
-        // Precalculate solutions
-        this.algorithms.calculateNearestNeighborSolution();
-        this.algorithms.calculateTwoOptSolution();
+        // Use setTimeout to allow the UI to update before intensive operations
+        setTimeout(() => {
+            try {
+                const numCities = this.gameState.resetGame(
+                    difficultyValue,
+                    adjustedCustomCityCount,
+                    this.dom.canvas.width,
+                    this.dom.canvas.height
+                );
 
-        // Update solution lengths
-        this.dom.nnLengthElement.textContent =
-            this.gameState.calculatePathLength(this.gameState.nearestNeighborPath).toFixed(2);
-        this.dom.optimalLengthElement.textContent =
-            this.gameState.calculatePathLength(this.gameState.optimalPath).toFixed(2);
-        this.dom.enhancedLengthElement.textContent = "N/A"; // Reset enhanced length
+                // Update DOM elements
+                this.dom.totalCitiesElement.textContent = numCities;
+                this.dom.citiesVisitedElement.textContent = 0;
+                this.dom.currentLengthElement.textContent = "0";
 
-        this.renderer.drawGame();
+                if (this.gameState.bestPathLength !== Infinity) {
+                    this.dom.bestLengthElement.textContent = this.gameState.bestPathLength.toFixed(2);
+                } else {
+                    this.dom.bestLengthElement.textContent = "N/A";
+                }
+
+                // Disable undo button
+                this.dom.undoButton.disabled = true;
+
+                // Use another setTimeout to precalculate solutions without blocking UI
+                this.calculateSolutionsAsync();
+            } catch (error) {
+                console.error("Error initializing game:", error);
+                alert("There was a problem starting the game. Please try with fewer cities.");
+            } finally {
+                this.hideLoadingIndicator();
+                this.renderer.drawGame();
+            }
+        }, 50);
+    }
+
+    /**
+     * Calculate algorithm solutions asynchronously in chunks
+     */
+    calculateSolutionsAsync() {
+        // First calculate nearest neighbor (usually faster)
+        setTimeout(() => {
+            try {
+                this.algorithms.calculateNearestNeighborSolution();
+                this.dom.nnLengthElement.textContent =
+                    this.gameState.calculatePathLength(this.gameState.nearestNeighborPath).toFixed(2);
+
+                // Then calculate 2-opt solution
+                setTimeout(() => {
+                    try {
+                        this.algorithms.calculateTwoOptSolution();
+                        this.dom.optimalLengthElement.textContent =
+                            this.gameState.calculatePathLength(this.gameState.optimalPath).toFixed(2);
+                        this.dom.enhancedLengthElement.textContent = "N/A"; // Reset enhanced length
+                    } catch (error) {
+                        console.error("Error calculating 2-opt solution:", error);
+                        this.dom.optimalLengthElement.textContent = "Error";
+                    }
+                }, 50);
+            } catch (error) {
+                console.error("Error calculating nearest neighbor solution:", error);
+                this.dom.nnLengthElement.textContent = "Error";
+            }
+        }, 50);
+    }
+
+    /**
+     * Show loading indicator while game initializes
+     */
+    showLoadingIndicator() {
+        // Create loading indicator if it doesn't exist
+        if (!this.loadingIndicator) {
+            this.loadingIndicator = document.createElement('div');
+            this.loadingIndicator.className = 'loading-indicator';
+            this.loadingIndicator.textContent = 'Generating cities...';
+            this.loadingIndicator.style.position = 'absolute';
+            this.loadingIndicator.style.top = '50%';
+            this.loadingIndicator.style.left = '50%';
+            this.loadingIndicator.style.transform = 'translate(-50%, -50%)';
+            this.loadingIndicator.style.padding = '1rem 2rem';
+            this.loadingIndicator.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+            this.loadingIndicator.style.color = 'white';
+            this.loadingIndicator.style.borderRadius = 'var(--border-radius)';
+            this.loadingIndicator.style.zIndex = '100';
+        }
+
+        // Add to DOM
+        const canvasContainer = this.dom.canvas.parentElement;
+        canvasContainer.style.position = 'relative';
+        canvasContainer.appendChild(this.loadingIndicator);
+
+        // Disable buttons during loading
+        this.dom.newGameButton.disabled = true;
+        this.dom.nearestNeighborButton.disabled = true;
+        this.dom.optimalButton.disabled = true;
+        this.dom.enhancedButton.disabled = true;
+    }
+
+    /**
+     * Hide loading indicator when finished
+     */
+    hideLoadingIndicator() {
+        if (this.loadingIndicator && this.loadingIndicator.parentElement) {
+            this.loadingIndicator.parentElement.removeChild(this.loadingIndicator);
+        }
+
+        // Re-enable buttons
+        this.dom.newGameButton.disabled = false;
+        this.dom.nearestNeighborButton.disabled = false;
+        this.dom.optimalButton.disabled = false;
+        this.dom.enhancedButton.disabled = false;
     }
 
     /**
@@ -305,7 +488,7 @@ class EventHandlers {
     handleDifficultyChange() {
         const selectedDifficulty = this.dom.difficultySelect.value;
         if (selectedDifficulty === 'custom') {
-            this.dom.customCitiesContainer.style.display = 'block';
+            this.dom.customCitiesContainer.style.display = 'flex';
             this.gameState.difficulty.custom = parseInt(this.dom.customCitiesInput.value);
             this.dom.totalCitiesElement.textContent = this.gameState.difficulty.custom;
         } else {
@@ -319,8 +502,12 @@ class EventHandlers {
      */
     handleCustomCitiesChange() {
         let value = parseInt(this.dom.customCitiesInput.value);
-        // Ensure value is between 5 and 100
-        value = Math.max(5, Math.min(100, value));
+
+        // For mobile, enforce a lower maximum
+        const maxCities = this.isMobile ? 50 : 100;
+
+        // Ensure value is between 5 and maxCities
+        value = Math.max(5, Math.min(maxCities, value));
         this.dom.customCitiesInput.value = value;
         this.gameState.difficulty.custom = value;
         this.dom.totalCitiesElement.textContent = value;
@@ -331,9 +518,12 @@ class EventHandlers {
      * @param {Event} e - Input event
      */
     handleCitySizeChange(e) {
-        const newSize = parseInt(e.target.value);
+        // For mobile, enforce a minimum city size for better touch targets
+        const minSize = this.isMobile ? 8 : 4;
+        const newSize = Math.max(minSize, parseInt(e.target.value));
         this.gameState.updateCitySize(newSize);
         this.dom.citySizeValue.textContent = newSize;
+        this.dom.citySizeInput.value = newSize;
         if (this.gameState.gameStarted) {
             this.renderer.drawGame();
         }
@@ -343,6 +533,16 @@ class EventHandlers {
      * Handle window resize event
      */
     handleWindowResize() {
+        // Check if mobile status has changed
+        const wasMobile = this.isMobile;
+        this.isMobile = this.detectMobile();
+
+        // If mobile status changed, we need to update event listeners
+        if (wasMobile !== this.isMobile) {
+            this.removeEventListeners();
+            this.setupEventListeners();
+        }
+
         this.renderer.resizeCanvas();
     }
 }

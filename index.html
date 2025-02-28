@@ -3,9 +3,13 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description"
+    content="Interactive Traveling Salesperson Problem game - connect cities in the shortest possible path">
+  <meta name="theme-color" content="#4361ee">
   <title>Traveling Salesperson Game</title>
   <link rel="stylesheet" href="assets/css/modern-style.css">
+  <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,48 +23,51 @@
   <div class="game-container">
     <div class="control-group">
       <label for="difficulty-select">Difficulty:</label>
-      <select id="difficulty-select">
+      <select id="difficulty-select" aria-label="Select difficulty level">
         <option value="easy">Easy (10 cities)</option>
         <option value="medium" selected>Medium (15 cities)</option>
         <option value="hard">Hard (25 cities)</option>
         <option value="expert">Expert (40 cities)</option>
         <option value="custom">Custom</option>
       </select>
-      <button id="new-game-btn">New Game</button>
+      <button id="new-game-btn" aria-label="Start new game">New Game</button>
 
       <div id="custom-cities-container">
         <label for="custom-cities">Number of cities:</label>
-        <input type="number" id="custom-cities" min="5" max="100" value="20">
+        <input type="number" id="custom-cities" min="5" max="100" value="20" aria-label="Custom number of cities">
       </div>
     </div>
 
     <div class="slider-container">
       <label for="city-size">City Size:</label>
-      <input type="range" id="city-size" min="4" max="15" value="8">
+      <input type="range" id="city-size" min="4" max="15" value="8" aria-label="Adjust city size">
       <span id="city-size-value" class="value-display">8</span>
     </div>
 
-    <canvas id="tsp-canvas" width="700" height="400"></canvas>
+    <canvas id="tsp-canvas" width="700" height="400" aria-label="Game board with cities to connect" role="img"></canvas>
 
     <div class="controls">
       <div class="control-group">
-        <button id="reset-path-btn">Reset Path</button>
-        <button id="undo-btn" disabled>Undo Last</button>
-        <button id="clear-best-btn">Clear Best</button>
+        <button id="reset-path-btn" aria-label="Reset current path">Reset Path</button>
+        <button id="undo-btn" disabled aria-label="Undo last city selection">Undo Last</button>
+        <button id="clear-best-btn" aria-label="Clear best path">Clear Best</button>
       </div>
 
       <div class="control-group">
-        <button id="nearest-neighbor-btn" title="Quick approximation algorithm">Nearest Neighbor</button>
-        <button id="optimal-btn" title="2-opt improvement algorithm">2-Opt Solution</button>
-        <button id="enhanced-btn" title="Combined optimization techniques">Enhanced Solution</button>
-        <span class="tooltip">?
+        <button id="nearest-neighbor-btn" title="Quick approximation algorithm"
+          aria-label="Show nearest neighbor solution">Nearest Neighbor</button>
+        <button id="optimal-btn" title="2-opt improvement algorithm" aria-label="Show 2-opt solution">2-Opt
+          Solution</button>
+        <button id="enhanced-btn" title="Combined optimization techniques" aria-label="Show enhanced solution">Enhanced
+          Solution</button>
+        <span class="tooltip" role="button" tabindex="0" aria-label="Information about enhanced solution">?
           <span class="tooltip-text">The Enhanced Solution combines three optimization techniques: 2-Opt (edge
             swapping), City-Swap (swapping city positions), and Or-Opt (relocating chains of cities).</span>
         </span>
       </div>
     </div>
 
-    <div class="stats">
+    <div class="stats" aria-live="polite">
       <p>Cities visited: <span id="cities-visited">0</span> / <span id="total-cities">15</span></p>
       <p>Current path: <span id="current-length" class="current-path">0</span></p>
       <p>Best path: <span id="best-length" class="best-path">N/A</span></p>
@@ -87,8 +94,8 @@
   </div>
 
   <footer>
-    <p>© 2025 TSP Game | <a href="https://github.com/jpjj/tsp_game" target="_blank">View on GitHub</a> | <a
-        href="https://jpjj.github.io" target="_blank">View my Website</a></p>
+    <p>© 2025 TSP Game | <a href="https://github.com/jpjj/tsp_game" target="_blank" rel="noopener">View on GitHub</a> |
+      <a href="https://jpjj.github.io" target="_blank" rel="noopener">View my Website</a></p>
   </footer>
 
   <!-- Note the "type=module" which enables ES modules -->

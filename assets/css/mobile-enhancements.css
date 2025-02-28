@@ -1,0 +1,224 @@
+/* Mobile-first enhancements for TSP Game */
+
+/* Adjustments for very small screens */
+@media (max-width: 480px) {
+    body {
+        padding: 1rem 0.75rem;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .game-container {
+        padding: 1rem;
+    }
+
+    /* Make buttons bigger on mobile for better touch targets */
+    button {
+        padding: 0.8rem 1rem;
+        margin-bottom: 0.5rem;
+        min-width: 100%;
+        font-size: 1rem;
+    }
+
+    /* Stack all controls vertically on small screens */
+    .control-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    /* Adjust the difficulty dropdown */
+    #difficulty-select {
+        width: 100%;
+        padding: 0.8rem;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    /* Make the canvas more responsive */
+    canvas {
+        width: 100% !important;
+        height: auto !important;
+        touch-action: manipulation;
+        /* Prevents double-tap to zoom */
+    }
+
+    /* Make stats more readable on small screens */
+    .stats {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+
+    /* Custom cities container adjustments */
+    #custom-cities-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #custom-cities-container label {
+        margin-bottom: 0.5rem;
+    }
+
+    #custom-cities {
+        width: 100%;
+    }
+
+    /* Adjust slider for better mobile experience */
+    .slider-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .slider-container label {
+        margin-bottom: 0.5rem;
+    }
+
+    input[type="range"] {
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+
+    .value-display {
+        align-self: flex-end;
+    }
+}
+
+/* Medium-sized mobile devices */
+@media (min-width: 481px) and (max-width: 767px) {
+    body {
+        padding: 1.5rem 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    /* Two-column button layout for medium screens */
+    .control-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    button {
+        padding: 0.75rem 1rem;
+        min-width: auto;
+    }
+
+    /* Make the difficulty select smaller */
+    #difficulty-select {
+        grid-column: span 2;
+    }
+
+    /* New game button spans full width */
+    #new-game-btn {
+        grid-column: span 2;
+    }
+}
+
+/* Additional touch optimizations for all mobile devices */
+@media (max-width: 767px) {
+
+    /* Increase touch target size for elements */
+    .tooltip {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    /* Ensure proper spacing in instructions */
+    .game-instructions li {
+        margin-bottom: 0.75rem;
+    }
+
+    /* Adjust footer */
+    footer {
+        margin-top: 2rem;
+        padding: 1rem 0;
+    }
+
+    /* Meta viewport tag - make sure it's correctly set in HTML */
+    /* This CSS comment is just a reminder - the actual tag should be in the HTML */
+    /* <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> */
+}
+
+/* Add finger-friendly styles */
+.city-hover {
+    cursor: pointer;
+}
+
+/* Add specific touch handling for tooltips */
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Make tooltip touch-friendly */
+.tooltip .tooltip-text {
+    width: 80%;
+    left: 10%;
+    margin-left: 0;
+}
+
+/* Loading indicator animation */
+@keyframes pulse {
+    0% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.5;
+    }
+}
+
+.loading-indicator {
+    animation: pulse 1.5s infinite ease-in-out;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Add this to your mobile-enhancements.css file */
+@media (max-width: 767px) {
+
+    /* Optimize performance on mobile */
+    canvas {
+        image-rendering: optimizeSpeed;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: optimize-contrast;
+    }
+
+    /* Reduce animation complexity on mobile */
+    .game-container:hover {
+        transform: none;
+        box-shadow: var(--card-shadow);
+    }
+
+    /* Make loading indicator more visible on mobile */
+    .loading-indicator {
+        font-size: 1rem;
+        padding: 1rem !important;
+        width: 80%;
+        text-align: center;
+    }
+}
+
+/* Fix for iOS form elements */
+input,
+select,
+button {
+    -webkit-appearance: none;
+    border-radius: var(--border-radius);
+}
