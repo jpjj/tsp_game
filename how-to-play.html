@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Learn how to play the Traveling Salesperson Problem game">
+    <meta name="theme-color" content="#4361ee">
+    <title>How to Play - Traveling Salesperson Game</title>
+    <link rel="stylesheet" href="assets/css/modern-style.css">
+    <link rel="stylesheet" href="assets/css/mobile-enhancements.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
+    <style>
+        /* How to Play specific styles */
+        .how-to-play-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all var(--transition-speed);
+            flex-grow: 1;
+            text-align: center;
+            max-width: 200px;
+        }
+
+        .nav-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .instructions-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .instructions-card h2 {
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .step {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .step h3 {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .step-number {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            margin-right: 1rem;
+            font-weight: 600;
+        }
+
+        .step img {
+            max-width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 1rem 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .tip {
+            background-color: rgba(67, 97, 238, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .tip-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .algorithm-box {
+            margin-top: 2rem;
+            background-color: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        .algorithm-box h3 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .algorithm-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .algorithm-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .algorithm-icon {
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .play-now-btn {
+            display: block;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin: 2rem auto;
+            max-width: 300px;
+            transition: all var(--transition-speed);
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+        }
+
+        .play-now-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(67, 97, 238, 0.3);
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .nav-buttons {
+                justify-content: center;
+            }
+
+            .nav-button {
+                flex-grow: 1;
+                max-width: none;
+            }
+
+            .step h3 {
+                font-size: 1.1rem;
+            }
+
+            .instructions-card {
+                padding: 1.5rem;
+            }
+
+            .algorithm-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="how-to-play-container">
+        <h1>How to Play</h1>
+
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-button">Home</a>
+            <a href="game.html" class="nav-button">Play Game</a>
+        </div>
+
+        <div class="instructions-card">
+            <h2>Game Instructions</h2>
+
+            <div class="step">
+                <h3><span class="step-number">1</span> Understand the Challenge</h3>
+                <p>The Traveling Salesperson Problem (TSP) is a classic computer science problem: Find the shortest
+                    possible route that visits each city exactly once and returns to the origin city.</p>
+                <p>This problem is famously difficult (NP-hard), meaning that as the number of cities increases, the
+                    number of possible routes grows exponentially. For just 10 cities, there are over 3 million possible
+                    routes!</p>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">2</span> Choose Your Difficulty</h3>
+                <p>Select a difficulty level from the dropdown menu:</p>
+                <ul>
+                    <li><strong>Easy:</strong> 10 cities - Good for beginners</li>
+                    <li><strong>Medium:</strong> 15 cities - Moderate challenge</li>
+                    <li><strong>Hard:</strong> 25 cities - Difficult optimization</li>
+                    <li><strong>Expert:</strong> 40 cities - Very challenging</li>
+                    <li><strong>Custom:</strong> Set your own number of cities (5-100)</li>
+                </ul>
+                <p>Then click the "New Game" button to generate a random set of cities.</p>
+
+                <div class="tip">
+                    <div class="tip-title">Tip:</div>
+                    <p>For mobile devices, we recommend starting with fewer cities (10-20) for better performance and
+                        touch accuracy.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">3</span> Create Your Path</h3>
+                <p>Click on cities one by one to create your path. Your goal is to:</p>
+                <ul>
+                    <li>Visit each city exactly once</li>
+                    <li>Return to your starting city to complete the tour</li>
+                    <li>Find the shortest possible total distance</li>
+                </ul>
+                <p>The first city you click becomes your starting point (green). As you build your path, visited cities
+                    turn blue, and unvisited cities remain red.</p>
+
+                <div class="tip">
+                    <div class="tip-title">Tip:</div>
+                    <p>Carefully consider your starting city - it can significantly impact your final path length!</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">4</span> Complete Your Tour</h3>
+                <p>After you've visited all cities (except one), clicking on the final unvisited city will automatically
+                    complete your tour by returning to your starting point.</p>
+                <p>The game will display your total path length and compare it to the algorithm solutions.</p>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">5</span> Compare with Algorithms</h3>
+                <p>The game provides three algorithm solutions for comparison:</p>
+
+                <div class="algorithm-grid">
+                    <div class="algorithm-card">
+                        <h4><span class="algorithm-icon">🔍</span> Nearest Neighbor</h4>
+                        <p>A simple greedy algorithm that always visits the closest unvisited city next. Fast but often
+                            suboptimal.</p>
+                    </div>
+
+                    <div class="algorithm-card">
+                        <h4><span class="algorithm-icon">⚙️</span> 2-Opt Solution</h4>
+                        <p>Takes the Nearest Neighbor solution and improves it by repeatedly swapping edges when doing
+                            so reduces the path length.</p>
+                    </div>
+
+                    <div class="algorithm-card">
+                        <h4><span class="algorithm-icon">🚀</span> Enhanced Solution</h4>
+                        <p>Uses multiple optimization techniques: 2-Opt, city-swap, and Or-Opt for a high-quality (but
+                            still not guaranteed optimal) solution.</p>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <div class="tip-title">Challenge:</div>
+                    <p>Try to beat the Nearest Neighbor algorithm first, then aim for the 2-Opt solution. Beating the
+                        Enhanced Solution is extremely difficult!</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <h3><span class="step-number">6</span> Game Controls</h3>
+                <p>Use these controls to aid your gameplay:</p>
+                <ul>
+                    <li><strong>Undo Last:</strong> Remove the last city from your path</li>
+                    <li><strong>Reset Path:</strong> Clear your current path and start over</li>
+                    <li><strong>Clear Best:</strong> Clear your best recorded path length</li>
+                    <li><strong>City Size:</strong> Adjust the size of cities for better visibility</li>
+                    <li><strong>Algorithm Buttons:</strong> View solutions from each algorithm</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="instructions-card">
+            <h2>Why TSP Matters</h2>
+            <p>The Traveling Salesperson Problem isn't just a game - it has important real-world applications:</p>
+            <ul>
+                <li><strong>Logistics and Route Planning:</strong> Delivery services, postal routes, and transportation
+                    networks</li>
+                <li><strong>Circuit Board Manufacturing:</strong> Optimizing drilling operations</li>
+                <li><strong>DNA Sequencing:</strong> Arranging DNA fragments</li>
+                <li><strong>Computer Wiring:</strong> Minimizing cable lengths</li>
+                <li><strong>Warehouse Order Picking:</strong> Optimizing paths through warehouses</li>
+            </ul>
+            <p>By playing this game, you're tackling one of the most studied problems in computational complexity!</p>
+        </div>
+
+        <a href="game.html" class="play-now-btn">Play Now!</a>
+
+        <footer>
+            <p>© 2025 TSP Game | <a href="https://github.com/jpjj/tsp_game" target="_blank" rel="noopener">View on
+                    GitHub</a> |
+                <a href="https://jpjj.github.io" target="_blank" rel="noopener">View my Website</a>
+            </p>
+        </footer>
+    </div>
+</body>
+
+</html>
