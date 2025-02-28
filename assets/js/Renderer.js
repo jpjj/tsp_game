@@ -55,14 +55,24 @@ class Renderer {
 
         // Mobile-first approach - always make canvas full width of container
         this.canvas.width = containerWidth;
+
+        // Maintain aspect ratio
         this.canvas.height = containerWidth * this.canvasRatio;
 
-        // When resizing, we need to maintain city positions relative to canvas dimensions
+        // If we're on mobile, ensure cities are scaled appropriately
+        if (this.isMobile && this.gameState.gameStarted) {
+            // Ensure city size is appropriate for mobile view
+            this.gameState.updateCitySize(Math.max(8, this.gameState.citySize));
+        }
+
+        // When resizing, redraw the game
         if (this.gameState.gameStarted) {
             this.drawGame();
         }
-    }
 
+        // For debugging
+        console.log(`Canvas resized: ${this.canvas.width}x${this.canvas.height}, Mobile: ${this.isMobile}`);
+    }
     /**
      * Draw the game state on the canvas
      */
