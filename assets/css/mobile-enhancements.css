@@ -1,11 +1,14 @@
 /* Mobile-first enhancements for TSP Game */
 
-/* Adjustments for very small screens */
+/* Base mobile styles (small screens) */
 @media (max-width: 480px) {
+
+    /* Layout */
     body {
         padding: 1rem 0.75rem;
     }
 
+    /* Typography */
     h1 {
         font-size: 1.75rem;
         margin-bottom: 0.5rem;
@@ -17,11 +20,12 @@
         margin-bottom: 1.5rem;
     }
 
+    /* Game container */
     .game-container {
         padding: 1rem;
     }
 
-    /* Make buttons bigger on mobile for better touch targets */
+    /* Controls */
     button {
         padding: 0.8rem 1rem;
         margin-bottom: 0.5rem;
@@ -29,13 +33,11 @@
         font-size: 1rem;
     }
 
-    /* Stack all controls vertically on small screens */
     .control-group {
         flex-direction: column;
         width: 100%;
     }
 
-    /* Adjust the difficulty dropdown */
     #difficulty-select {
         width: 100%;
         padding: 0.8rem;
@@ -43,7 +45,7 @@
         font-size: 1rem;
     }
 
-    /* Make the canvas more responsive */
+    /* Canvas */
     canvas {
         width: 100% !important;
         height: auto !important;
@@ -51,14 +53,14 @@
         /* Prevents double-tap to zoom */
     }
 
-    /* Make stats more readable on small screens */
+    /* Stats and UI components */
     .stats {
         grid-template-columns: 1fr;
         padding: 1rem;
         font-size: 0.9rem;
     }
 
-    /* Custom cities container adjustments */
+    /* Custom cities controls */
     #custom-cities-container {
         flex-direction: column;
         align-items: flex-start;
@@ -72,7 +74,7 @@
         width: 100%;
     }
 
-    /* Adjust slider for better mobile experience */
+    /* Slider controls */
     .slider-container {
         flex-direction: column;
         align-items: flex-start;
@@ -102,7 +104,7 @@
         font-size: 2rem;
     }
 
-    /* Two-column button layout for medium screens */
+    /* Two-column button layout */
     .control-group {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -115,61 +117,86 @@
         min-width: auto;
     }
 
-    /* Make the difficulty select smaller */
-    #difficulty-select {
-        grid-column: span 2;
-    }
-
-    /* New game button spans full width */
+    #difficulty-select,
     #new-game-btn {
         grid-column: span 2;
     }
 }
 
-/* Additional touch optimizations for all mobile devices */
+/* All mobile devices (up to tablet) */
 @media (max-width: 767px) {
 
-    /* Increase touch target size for elements */
+    /* Touch optimizations */
     .tooltip {
         width: 2rem;
         height: 2rem;
     }
 
-    /* Ensure proper spacing in instructions */
+    /* Typography and spacing */
     .game-instructions li {
         margin-bottom: 0.75rem;
     }
 
-    /* Adjust footer */
     footer {
         margin-top: 2rem;
         padding: 1rem 0;
     }
 
-    /* Meta viewport tag - make sure it's correctly set in HTML */
-    /* This CSS comment is just a reminder - the actual tag should be in the HTML */
-    /* <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> */
+    /* Performance optimizations */
+    canvas {
+        image-rendering: optimizeSpeed;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: optimize-contrast;
+    }
+
+    /* Disable hover effects */
+    .game-container:hover {
+        transform: none;
+        box-shadow: var(--card-shadow);
+    }
+
+    /* Loading indicator */
+    .loading-indicator {
+        font-size: 1rem;
+        padding: 1rem !important;
+        width: 80%;
+        text-align: center;
+    }
+
+    /* Tooltip styles */
+    .tooltip .tooltip-text {
+        width: 260px;
+        max-width: 85vw;
+        font-size: 0.9rem;
+        padding: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: left;
+        line-height: 1.4;
+        word-wrap: break-word;
+    }
 }
 
-/* Add finger-friendly styles */
+/* Touch-friendly styles (all devices) */
 .city-hover {
     cursor: pointer;
 }
 
-/* Add specific touch handling for tooltips */
 .tooltip:hover .tooltip-text {
     visibility: visible;
     opacity: 1;
 }
 
-/* Make tooltip touch-friendly */
-.tooltip .tooltip-text {
-    width: 80%;
-    left: 10%;
-    margin-left: 0;
+/* iOS form element fixes */
+input,
+select,
+button {
+    -webkit-appearance: none;
+    border-radius: var(--border-radius);
 }
 
-/* Loading indicator animation */
+/* Loading animation */
 @keyframes pulse {
     0% {
         opacity: 0.5;
@@ -187,38 +214,4 @@
 .loading-indicator {
     animation: pulse 1.5s infinite ease-in-out;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Add this to your mobile-enhancements.css file */
-@media (max-width: 767px) {
-
-    /* Optimize performance on mobile */
-    canvas {
-        image-rendering: optimizeSpeed;
-        image-rendering: -moz-crisp-edges;
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: optimize-contrast;
-    }
-
-    /* Reduce animation complexity on mobile */
-    .game-container:hover {
-        transform: none;
-        box-shadow: var(--card-shadow);
-    }
-
-    /* Make loading indicator more visible on mobile */
-    .loading-indicator {
-        font-size: 1rem;
-        padding: 1rem !important;
-        width: 80%;
-        text-align: center;
-    }
-}
-
-/* Fix for iOS form elements */
-input,
-select,
-button {
-    -webkit-appearance: none;
-    border-radius: var(--border-radius);
 }

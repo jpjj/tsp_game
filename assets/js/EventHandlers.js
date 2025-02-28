@@ -360,10 +360,10 @@ class EventHandlers {
 
         // For mobile, limit the maximum number of cities to prevent performance issues
         let adjustedCustomCityCount = customCityCount;
-        if (this.isMobile && customCityCount > 30) {
-            adjustedCustomCityCount = 30; // Reduce from 50 to 30 for better performance
-            this.dom.customCitiesInput.value = 30;
-            alert("On mobile devices, the maximum number of cities is limited to 30 for performance reasons.");
+        if (this.isMobile && customCityCount > 50) {
+            adjustedCustomCityCount = 50;
+            this.dom.customCitiesInput.value = 50;
+            alert("On mobile devices, the maximum number of cities is limited to 50 for performance reasons.");
         }
 
         // Show loading indicator
