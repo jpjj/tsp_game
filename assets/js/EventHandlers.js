@@ -1,7 +1,10 @@
 /**
  * EventHandlers.js
  * Updated with improved touch support for mobile devices
+ * Added CompletionModal for better tour completion experience
  */
+
+import CompletionModal from './CompletionModal.js';
 
 /**
  * Class to handle game UI events
@@ -25,6 +28,9 @@ class EventHandlers {
         this.touchStartY = 0;
         this.touchMoved = false;
         this.clickDelay = 300; // ms to wait to distinguish between tap and scroll
+
+        // Initialize completion modal
+        this.completionModal = new CompletionModal(gameState, algorithms, this);
 
         // Bind event handlers to maintain 'this' context
         this.handleCanvasClick = this.handleCanvasClick.bind(this);
@@ -203,31 +209,8 @@ class EventHandlers {
                     this.dom.bestLengthElement.textContent = this.gameState.bestPathLength.toFixed(2);
                 }
 
-                // Show completion message - use a more mobile-friendly approach if on mobile
-                let message = `Tour completed! Your path length: ${result.pathLength.toFixed(2)}\n`;
-                message += `Nearest Neighbor: ${result.nnLength.toFixed(2)}\n`;
-                message += `2-Opt Solution: ${result.optimalLength.toFixed(2)}\n`;
-
-                // If enhanced solution is calculated, include it in the message
-                if (result.enhancedLength !== Infinity) {
-                    message += `Enhanced Solution: ${result.enhancedLength.toFixed(2)}\n\n`;
-                } else {
-                    message += '\n';
-                }
-
-                if (result.enhancedLength !== Infinity && result.pathLength <= result.enhancedLength) {
-                    message += "Outstanding! You beat or matched the Enhanced algorithm!";
-                } else if (result.pathLength <= result.optimalLength) {
-                    message += "Impressive! You beat or matched the 2-Opt algorithm!";
-                } else if (result.pathLength <= result.nnLength) {
-                    message += "Great job! You beat the Nearest Neighbor algorithm!";
-                } else {
-                    message += "Keep trying! Can you beat the algorithms?";
-                }
-
-                setTimeout(() => {
-                    alert(message);
-                }, 100);
+                // Show the completion modal instead of an alert
+                this.completionModal.show(result);
             }
 
             // Redraw the game
