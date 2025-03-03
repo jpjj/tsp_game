@@ -128,7 +128,7 @@ class CompletionModal {
 
         switch (userRank) {
             case 1:
-                message = "🏆 Outstanding! You found the best solution, better than all algorithms!";
+                message = "🏆 Outstanding! You found the best solution, better than all algorithms! You are ready for an even harder <a href='https://jpjj.github.io/cvrp_game/' target='_blank'>CHALLENGE</a>!";
                 break;
             case 2:
                 if (solutions[0].name === 'Enhanced Solution') {
@@ -145,7 +145,7 @@ class CompletionModal {
                 break;
         }
 
-        this.completionMessage.textContent = message;
+        this.completionMessage.innerHTML = message;
 
         // Show the modal
         this.modal.style.display = 'flex';
