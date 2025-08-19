@@ -143,14 +143,14 @@ class Renderer {
             this.ctx.fill();
 
             // Draw city number - adjust font size for mobile
-            this.ctx.fillStyle = 'white';
-            const fontSize = this.isMobile
-                ? Math.max(10, citySize - 2)
-                : Math.max(10, this.gameState.citySize - 2);
-            this.ctx.font = `${fontSize}px Arial`;
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
-            this.ctx.fillText(i.toString(), city.x, city.y);
+            // this.ctx.fillStyle = 'white';
+            // const fontSize = this.isMobile
+            //     ? Math.max(10, citySize - 2)
+            //     : Math.max(10, this.gameState.citySize - 2);
+            // this.ctx.font = `${fontSize}px Arial`;
+            // this.ctx.textAlign = 'center';
+            // this.ctx.textBaseline = 'middle';
+            // this.ctx.fillText(i.toString(), city.x, city.y);
         }
 
         // Reset shadow
